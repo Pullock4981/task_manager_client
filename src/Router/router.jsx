@@ -5,6 +5,7 @@ import Tasks from "../Pages/Tasks/Tasks";
 import Dashboard from "../Pages/Dashboard/Dashboard";
 import Login from "../components/Login/Login";
 import Register from "../components/Register/Register";
+import PrivateRoute from "../components/PrivateRoute/PrivateRoute";
 
 
 const router = createBrowserRouter([
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/dashboard',
-                Component: Dashboard
+                element: <PrivateRoute><Dashboard /></PrivateRoute>
             },
             {
                 path: '/login',
