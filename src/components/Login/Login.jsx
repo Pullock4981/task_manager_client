@@ -54,7 +54,7 @@ const Login = () => {
                 console.log("Google User:", result.user);
 
                 // Save user to backend
-                fetch("http://localhost:5000/users", {
+                fetch("https://task-manager-backend-weld-nine.vercel.app/users", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

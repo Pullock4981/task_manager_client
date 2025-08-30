@@ -12,7 +12,7 @@ const Tasks = () => {
         if (!user) return;
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:5000/tasks/users/${user.email}`);
+            const res = await fetch(`https://task-manager-backend-weld-nine.vercel.app/tasks/users/${user.email}`);
             const data = await res.json();
             const sortedTasks = data.sort((a, b) => {
                 if (a.completed === b.completed) {
@@ -43,7 +43,7 @@ const Tasks = () => {
 
         if (confirm.isConfirmed) {
             try {
-                await fetch(`http://localhost:5000/tasks/${id}`, { method: "DELETE" });
+                await fetch(`https://task-manager-backend-weld-nine.vercel.app/tasks/${id}`, { method: "DELETE" });
                 Swal.fire("Deleted!", "Task has been deleted.", "success");
                 fetchTasks();
             } catch (err) {
@@ -56,7 +56,7 @@ const Tasks = () => {
     const toggleCompleted = async (task) => {
         if (task.completed) return;
         try {
-            await fetch(`http://localhost:5000/tasks/${task._id}`, {
+            await fetch(`https://task-manager-backend-weld-nine.vercel.app/tasks/${task._id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ completed: !task.completed }),
@@ -83,7 +83,7 @@ const Tasks = () => {
 
         if (formValues) {
             try {
-                await fetch(`http://localhost:5000/tasks/${task._id}`, {
+                await fetch(`https://task-manager-backend-weld-nine.vercel.app/tasks/${task._id}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(formValues),

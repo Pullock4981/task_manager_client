@@ -20,7 +20,7 @@ const ActivityChart = () => {
 
         const fetchTasks = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/tasks/users/${user.email}`);
+                const res = await fetch(`https://task-manager-backend-weld-nine.vercel.app/tasks/users/${user.email}`);
                 const tasks = await res.json();
 
                 // Map tasks by day

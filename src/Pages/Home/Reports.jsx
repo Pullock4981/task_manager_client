@@ -9,7 +9,7 @@ const Reports = () => {
     useEffect(() => {
         if (!user?.email) return;
 
-        fetch(`http://localhost:5000/tasks/users/${user.email}`)
+        fetch(`https://task-manager-backend-weld-nine.vercel.app/tasks/users/${user.email}`)
             .then(res => res.json())
             .then(tasks => {
                 const completed = tasks.filter(task => task.completed).length;

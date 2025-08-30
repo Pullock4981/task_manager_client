@@ -1,9 +1,7 @@
-import React, { useContext, useState } from "react";
-import { AuthContext } from "../../Context/AuthContext";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 
 const AddTask = ({ onTaskAdded }) => {
-    const { user } = useContext(AuthContext);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
@@ -11,27 +9,23 @@ const AddTask = ({ onTaskAdded }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!user) {
-            Swal.fire("Error", "You must be logged in to add a task", "error");
-            return;
-        }
-
         const newTask = {
             title,
             description,
             completed: false,
-            userEmail: user.email,
-            createdAt: new Date(), // Important for chart
+            createdAt: new Date(), 
         };
 
         setLoading(true);
 
         try {
-            const response = await fetch("http://localhost:5000/tasks", {
+            const response = await fetch("https://task-manager-backend-weld-nine.vercel.app/tasks", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newTask),
             });
+
+            if (!response.ok) throw new Error("Failed to add task");
 
             const data = await response.json();
             console.log("Task added:", data);
@@ -40,9 +34,7 @@ const AddTask = ({ onTaskAdded }) => {
             setTitle("");
             setDescription("");
 
-            // Notify parent component (e.g., dashboard) to refresh chart
             if (onTaskAdded) onTaskAdded();
-
         } catch (err) {
             console.error(err);
             Swal.fire("Error", "Failed to add task", "error");

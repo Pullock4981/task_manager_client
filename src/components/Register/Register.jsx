@@ -11,7 +11,7 @@ const Register = () => {
     // 🔹 Add user to backend
     const addUserToDB = async (user) => {
         try {
-            await fetch("http://localhost:5000/users", {
+            await fetch("https://task-manager-backend-weld-nine.vercel.app/users", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
