@@ -2,18 +2,22 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../Context/AuthContext";
 import Swal from "sweetalert2";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router";
 
 const Tasks = () => {
     const { user } = useContext(AuthContext);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
+    // Fetch tasks for logged-in user
     const fetchTasks = async () => {
-        if (!user) return;
+        if (!user?.email) return;
         setLoading(true);
         try {
             const res = await fetch(`https://task-manager-backend-weld-nine.vercel.app/tasks/users/${user.email}`);
             const data = await res.json();
+            // Sort: incomplete tasks first, then completed, then by creation date
             const sortedTasks = data.sort((a, b) => {
                 if (a.completed === b.completed) {
                     return new Date(a.createdAt) - new Date(b.createdAt);
@@ -21,9 +25,10 @@ const Tasks = () => {
                 return a.completed ? 1 : -1;
             });
             setTasks(sortedTasks);
-            setLoading(false);
         } catch (err) {
-            console.error(err);
+            console.error("Error fetching tasks:", err);
+            Swal.fire("Error", "Failed to load tasks from server", "error");
+        } finally {
             setLoading(false);
         }
     };
@@ -32,6 +37,7 @@ const Tasks = () => {
         fetchTasks();
     }, [user]);
 
+    // Delete a task
     const handleDelete = async (id) => {
         const confirm = await Swal.fire({
             title: "Are you sure?",
@@ -43,7 +49,9 @@ const Tasks = () => {
 
         if (confirm.isConfirmed) {
             try {
-                await fetch(`https://task-manager-backend-weld-nine.vercel.app/tasks/${id}`, { method: "DELETE" });
+                await fetch(`https://task-manager-backend-weld-nine.vercel.app/tasks/${id}`, {
+                    method: "DELETE",
+                });
                 Swal.fire("Deleted!", "Task has been deleted.", "success");
                 fetchTasks();
             } catch (err) {
@@ -53,6 +61,7 @@ const Tasks = () => {
         }
     };
 
+    // Mark task as completed
     const toggleCompleted = async (task) => {
         if (task.completed) return;
         try {
@@ -68,6 +77,7 @@ const Tasks = () => {
         }
     };
 
+    // Update task title/description
     const handleUpdate = async (task) => {
         const { value: formValues } = await Swal.fire({
             title: "Update Task",
@@ -97,7 +107,21 @@ const Tasks = () => {
         }
     };
 
-    if (!user) return <p className="text-center py-10">Please login to see your tasks</p>;
+    // Not logged in message
+    if (!user) {
+        return (
+            <div className="text-center py-20">
+                <p className="mb-4 text-lg font-medium">Please login to see your tasks</p>
+                <button
+                    onClick={() => navigate("/login")}
+                    className="btn btn-primary"
+                >
+                    Go to Login
+                </button>
+            </div>
+        );
+    }
+
     if (loading) return <p className="text-center py-10">Loading tasks...</p>;
 
     return (

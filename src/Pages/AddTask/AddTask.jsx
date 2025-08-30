@@ -1,40 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Swal from "sweetalert2";
+import { AuthContext } from "../../Context/AuthContext";
 
 const AddTask = ({ onTaskAdded }) => {
+    const { user } = useContext(AuthContext);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!user?.email) return Swal.fire("Error", "You must be logged in to add a task", "error");
 
         const newTask = {
             title,
             description,
+            userEmail: user.email, // Attach logged-in user email
             completed: false,
-            createdAt: new Date(), 
+            createdAt: new Date(),
         };
 
         setLoading(true);
-
         try {
-            const response = await fetch("https://task-manager-backend-weld-nine.vercel.app/tasks", {
+            const res = await fetch("https://task-manager-backend-weld-nine.vercel.app/tasks", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newTask),
             });
 
-            if (!response.ok) throw new Error("Failed to add task");
+            if (!res.ok) throw new Error("Failed to add task");
 
-            const data = await response.json();
-            console.log("Task added:", data);
-
+            const data = await res.json();
             Swal.fire("Success", "Task added successfully!", "success");
             setTitle("");
             setDescription("");
 
-            if (onTaskAdded) onTaskAdded();
+            if (onTaskAdded) onTaskAdded(); // Refresh task list
         } catch (err) {
             console.error(err);
             Swal.fire("Error", "Failed to add task", "error");
@@ -48,9 +49,7 @@ const AddTask = ({ onTaskAdded }) => {
             <h1 className="text-2xl font-bold mb-4 text-center">Add a New Task</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="form-control w-full">
-                    <label htmlFor="taskTitle" className="label font-medium">
-                        Task Title
-                    </label>
+                    <label htmlFor="taskTitle" className="label font-medium">Task Title</label>
                     <input
                         type="text"
                         id="taskTitle"
@@ -61,11 +60,8 @@ const AddTask = ({ onTaskAdded }) => {
                         required
                     />
                 </div>
-
                 <div className="form-control w-full">
-                    <label htmlFor="taskDescription" className="label font-medium">
-                        Task Description
-                    </label>
+                    <label htmlFor="taskDescription" className="label font-medium">Task Description</label>
                     <textarea
                         id="taskDescription"
                         placeholder="Enter task description"
@@ -75,7 +71,6 @@ const AddTask = ({ onTaskAdded }) => {
                         required
                     ></textarea>
                 </div>
-
                 <button
                     type="submit"
                     disabled={loading}
