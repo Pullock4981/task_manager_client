@@ -3,9 +3,11 @@ import React from 'react';
 const Footer = () => {
     return (
         <div>
-            <h1>
-                this is footer
-            </h1>
+            <footer className="footer sm:footer-horizontal footer-center bg-base-300 text-base-content p-4">
+                <aside>
+                    <p>Copyright © {new Date().getFullYear()} - All right reserved by Rootx Softwares</p>
+                </aside>
+            </footer>
         </div>
     );
 };
