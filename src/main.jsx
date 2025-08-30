@@ -5,10 +5,13 @@ import './index.css'
 
 import { RouterProvider } from "react-router/dom";
 import router from './Router/router';
+import FirebaseAuthProvider from './Context/FirebaseAuthContext.jsx';
 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />,
+    <FirebaseAuthProvider>
+      <RouterProvider router={router} />
+    </FirebaseAuthProvider>
   </StrictMode>,
 )
