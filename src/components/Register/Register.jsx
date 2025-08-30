@@ -3,12 +3,27 @@ import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../Context/AuthContext";
 import Swal from "sweetalert2";
 
-
 const Register = () => {
     const navigate = useNavigate();
     const { createUser, googleSignIn } = useContext(AuthContext);
-
     const [loading, setLoading] = useState(false);
+
+    // 🔹 Add user to backend
+    const addUserToDB = async (user) => {
+        try {
+            await fetch("http://localhost:5000/users", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: user.displayName || user.name,
+                    email: user.email,
+                    photoURL: user.photoURL || user.photoURL,
+                }),
+            });
+        } catch (err) {
+            console.error("Failed to save user:", err);
+        }
+    };
 
     // 🔹 Register with Email & Password
     const handleRegister = async (e) => {
@@ -19,7 +34,6 @@ const Register = () => {
         const formData = new FormData(form);
         const { email, password, ...rest } = Object.fromEntries(formData.entries());
 
-        // Password validation
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
         if (!passwordRegex.test(password)) {
             setLoading(false);
@@ -30,15 +44,12 @@ const Register = () => {
             );
         }
 
-        const userInfo = {
-            email,
-            ...rest,
-        };
-
         createUser(email, password)
             .then((res) => {
                 setLoading(false);
                 console.log("User created:", res.user);
+
+                addUserToDB({ ...rest, ...res.user });
 
                 Swal.fire({
                     title: "Success 🎉",
@@ -47,11 +58,6 @@ const Register = () => {
                     timer: 1500,
                     showConfirmButton: false,
                 });
-
-                // addUser(
-                //     "https://resturent-management-system-server.vercel.app/users",
-                //     { email }
-                // );
 
                 navigate("/");
             })
@@ -69,6 +75,8 @@ const Register = () => {
                 setLoading(false);
                 console.log("Google User:", result.user);
 
+                addUserToDB(result.user);
+
                 Swal.fire({
                     title: "Welcome 🎉",
                     text: "Signed in with Google!",
@@ -76,11 +84,6 @@ const Register = () => {
                     timer: 1500,
                     showConfirmButton: false,
                 });
-
-                // addUser(
-                //     "https://resturent-management-system-server.vercel.app/users",
-                //     { email: result?.user?.email }
-                // );
 
                 navigate("/");
             })

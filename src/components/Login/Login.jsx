@@ -51,6 +51,19 @@ const Login = () => {
         googleSignIn()
             .then((result) => {
                 setLoading(false);
+                console.log("Google User:", result.user);
+
+                // Save user to backend
+                fetch("http://localhost:5000/users", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: result.user.displayName,
+                        email: result.user.email,
+                        photoURL: result.user.photoURL,
+                    }),
+                }).catch((err) => console.error(err));
+
                 Swal.fire({
                     title: "Welcome! 🎉",
                     text: "You logged in with Google",
